@@ -1,0 +1,16 @@
+@()(implicit message: RequestHeader)
+
+@content = {
+
+<div class="col-md-5">
+    <h6>Lauriane Mollier</h6>
+    <img src="@routes.Assets.versioned("images/team01.jpg")"/>
+</div>
+
+<div class="col-md-7">
+
+</div>
+
+}
+
+@template.template(content)(null)(message)

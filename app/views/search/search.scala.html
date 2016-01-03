@@ -1,0 +1,147 @@
+@import models.Foursquare.CompactVenue
+
+@(compactVenues: Seq[CompactVenue])(implicit message: RequestHeader)
+
+@content = {
+
+
+  <!-- begin:article -->
+  <div class="col-md-9 col-md-push-3">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="heading-title heading-title-alt">
+          <h3>Property meeting the search criteria</h3>
+        </div>
+      </div>
+    </div>
+    <!-- begin:sorting -->
+    <div class="row sort">
+
+      <div class="col-md-4 col-sm-4 col-xs-3">
+        <a href="search.html" class="btn btn-warning"><i class="fa fa-th"></i></a>
+        <a href="search_list.html" class="btn btn-default"><i class="fa fa-list"></i></a>
+        <span>Show <strong>6</strong> of <strong>30</strong> result.</span>
+      </div>
+      <div class="col-md-8 col-sm-8 col-xs-9">
+        <form class="form-inline" role="form">
+          <span>Sort by : </span>
+          <div class="form-group">
+            <label class="sr-only" for="sortby">Sort by : </label>
+            <select class="form-control">
+              <option>Most Recent</option>
+              <option>Price (Low &gt; High)</option>
+              <option>Price (High &gt; Low)</option>
+              <option>Most Popular (Low &gt; High)</option>
+            </select>
+          </div>
+          <span>Show : </span>
+          <div class="form-group">
+            <label class="sr-only" for="show">Show : </label>
+            <select class="form-control">
+              <option>6</option>
+              <option>10</option>
+              <option>15</option>
+              <option>20</option>
+              <option>25</option>
+              <option>50</option>
+              <option>100</option>
+            </select>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- end:sorting -->
+
+    <div class="row">
+      <div class="col-md-12">
+        <div id="map-property"></div>
+      </div>
+    </div>
+
+    <!-- begin:product -->
+    <div class="row container-realestate">
+
+      @for(i <- 0 until compactVenues.length){
+        @if(i % 3 == 0){
+          <div class="row">
+        }
+        <div class="col-md-4 col-sm-6 col-xs-12">
+          @restaurantMini(compactVenues(i))
+        </div>
+        @if(i % 3 == 2){
+          </div>
+        }
+      }
+
+    </div>
+    <!-- end:product -->
+
+    <!-- begin:pagination -->
+    <div class="row">
+      <div class="col-md-12">
+        <ul class="pagination">
+          <li class="disabled"><a href="#">&laquo;</a></li>
+          <li class="active"><a href="#">1 <span class="sr-only">(current)</span></a></li>
+          <li><a href="#">2</a></li>
+          <li><a href="#">3</a></li>
+          <li><a href="#">4</a></li>
+          <li><a href="#">5</a></li>
+          <li><a href="#">&raquo;</a></li>
+        </ul>
+      </div>
+    </div>
+    <!-- end:pagination -->
+  </div>
+  <!-- end:article -->
+}
+
+@sidebar = {
+<!-- begin:sidebar -->
+<div class="col-md-3 col-md-pull-9 sidebar">
+  <div class="widget widget-sidebar widget-white">
+    <div class="widget-header">
+      <h3>Recent Property</h3>
+    </div>
+    <ul>
+      <li><a href="#">Luxury Villa</a></li>
+      <li><a href="#">Land In Central Park</a></li>
+      <li><a href="#">The Urban Life</a></li>
+      <li><a href="#">Luxury Office</a></li>
+      <li><a href="">Luxury Villa In Rego Park</a></li>
+    </ul>
+  </div>
+  <!-- break -->
+  <div class="widget widget-sidebar widget-white">
+    <div class="widget-header">
+      <h3>Property Type</h3>
+    </div>
+    <ul class="list-check">
+      <li><a href="#">Office</a>&nbsp;(18)</li>
+      <li><a href="#">Office</a>&nbsp;(43)</li>
+      <li><a href="#">Shop</a>&nbsp;(31)</li>
+      <li><a href="#">Villa</a>&nbsp;(52)</li>
+      <li><a href="#">Apartment</a>&nbsp;(8)</li>
+      <li><a href="#">Single Family Home</a>&nbsp;(11)</li>
+    </ul>
+  </div>
+  <!-- break -->
+  <div class="widget widget-sidebar widget-white">
+    <div class="widget-header">
+      <h3>Top Agents</h3>
+    </div>
+    <ul>
+      <li><a href="#">John Doe</a></li>
+      <li><a href="#">Christoper Drew</a></li>
+      <li><a href="#">Jane Doe</a></li>
+      <li><a href="#">Jeny</a></li>
+    </ul>
+  </div>
+  <!-- break -->
+</div>
+<!-- end:sidebar -->
+}
+
+
+
+
+@template.template(content, sidebar)(null)(message)
