@@ -20,6 +20,8 @@ GET     /test                           controllers.Foursquare.test
 
 GET     /simpleSearch               controllers.Foursquare.simpleSearch
 
+GET     /categories                controllers.Foursquare.displayCategories
+
 
 
 

@@ -1,4 +1,4 @@
-@(content: Html, sidebar: Html = Html(""))(simpleSearchForm: Form[SimpleSearch])(implicit message: RequestHeader)
+@(content: Html, sidebar: Html = Html(""), css: Html = Html(""), js: Html = Html(""))(simpleSearchForm: Form[SimpleSearch])(implicit message: RequestHeader)
 
 <!DOCTYPE html>
 <html lang="en">
@@ -12,13 +12,17 @@
 
     <title>Arillo</title>
 
+
+    @js
+
+    @css
     <!-- Bootstrap core CSS -->
     <link href="@routes.Assets.versioned("orange/css/bootstrap.css")" rel="stylesheet">
 
     <!-- Custom styles for this template -->
     <link href='http://fonts.googleapis.com/css?family=Raleway:400,600,800' rel='stylesheet' type='text/css'>
     <link href="@routes.Assets.versioned("orange/css/font-awesome.min.css")" rel="stylesheet">
-    <link href="@routes.Assets.versioned("orange/css/style.css")" rel="stylesheet">
+    <link href="@routes.Assets.versioned("stylesheets/main.css")" rel="stylesheet">
     <link href="@routes.Assets.versioned("orange/css/responsive.css")" rel="stylesheet">
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
@@ -185,5 +189,9 @@
     <script src="@routes.Assets.versioned("orange/js/jquery.backstretch.js")"></script>
     <!--<script src="@routes.Assets.versioned("orange/js/jquery.nicescroll.min.js")"></script>-->
     <script src="@routes.Assets.versioned("orange/js/script.js")"></script>
+
+
+
+
   </body>
 </html>
