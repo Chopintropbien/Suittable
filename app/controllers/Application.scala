@@ -2,14 +2,14 @@ package controllers
 
 import play.api._
 import play.api.mvc._
-import models.SimpleSearch._
+import models.SimpleExplore._
 
 class Application extends Controller {
 
 
 
   def index = Action{ implicit request =>
-    Ok(views.html.index.index(simpleSearchForm))
+    Ok(views.html.index.index(simpleExploreForm))
   }
 
   def single = Action{ implicit request =>

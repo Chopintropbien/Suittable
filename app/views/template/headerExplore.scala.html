@@ -2,7 +2,7 @@
 @import play.api.Play.current
 @import play.api.i18n.Messages.Implicits._
 
-@(simpleSearchForm: Form[SimpleSearch])(implicit message: RequestHeader)
+@(simpleExploreForm: Form[SimpleExplore])(implicit message: RequestHeader)
 
 <!-- begin:header -->
 <div id="header" class="heading" style="background-image: url(@routes.Assets.versioned("images/img01.jpg)");">
@@ -12,11 +12,11 @@
             <div class="quick-search">
                 <div class="row">
 
-                    @helper.form(action = routes.Foursquare.simpleSearch, args= 'role -> "form"){
+                    @helper.form(action = routes.Foursquare.simpleExplore, args= 'role -> "form"){
                         <div class="col-md-5 col-sm-6 col-xs-12">
                             <div class="form-group">
                                 <label for="query">Find : </label>
-                                @helper.inputText(simpleSearchForm("query"),
+                                @helper.inputText(simpleExploreForm("query"),
                                     args = 'class -> "form-control",
                                     'placeholder -> "Pizza, Sushi, french food...")
                             </div>
@@ -25,7 +25,7 @@
                         <div class="col-md-5 col-sm-6 col-xs-12">
                             <div class="form-group">
                                 <label for="near">Near : </label>
-                                @helper.inputText(simpleSearchForm("near"),
+                                @helper.inputText(simpleExploreForm("near"),
                                 args = 'class -> "form-control",
                                 'placeholder -> "City, address, zip, ...")
                             </div>

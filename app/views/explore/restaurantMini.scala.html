@@ -1,11 +1,11 @@
 @import models.Foursquare.CompactVenue
 
-@(venue: CompactVenue)
+@(venue: CompactVenue, miniaturePhotoUrl: String)
 
 
 <div class="property-container">
     <div class="property-image">
-        <img src="@routes.Assets.versioned("images/img02.jpg")" alt="mikha real estate theme">
+        <img src="@miniaturePhotoUrl" alt="mikha real estate theme">
         <div class="property-price">
             <h4></h4>
             <span>$800,000</span>
@@ -25,8 +25,9 @@
             <small>
                 @venue.location.formatAddress
             </small>
-            @if(venue.contact.formattedPhone.isDefined){
-                <small> @venue.contact.formattedPhone.get </small>
+
+            @if(venue.contact.isDefined && venue.contact.get.formattedPhone.isDefined){
+                <small> @venue.contact.get.formattedPhone.get </small>
             }
         </h3>
     </div>

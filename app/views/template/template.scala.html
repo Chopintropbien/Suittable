@@ -1,4 +1,4 @@
-@(content: Html, sidebar: Html = Html(""), css: Html = Html(""), js: Html = Html(""))(simpleSearchForm: Form[SimpleSearch])(implicit message: RequestHeader)
+@(content: Html, sidebar: Html = Html(""), css: Html = Html(""), js: Html = Html(""))(simpleExploreForm: Form[SimpleExplore])(implicit message: RequestHeader)
 
 <!DOCTYPE html>
 <html lang="en">
@@ -12,8 +12,6 @@
 
     <title>Arillo</title>
 
-
-    @js
 
     @css
     <!-- Bootstrap core CSS -->
@@ -63,25 +61,19 @@
     </nav>
     <!-- end:navbar -->
 
-    @if(simpleSearchForm != null){
-      @views.html.template.headerSearch(simpleSearchForm)(message)
+    @if(simpleExploreForm != null){
+      @views.html.template.headerExplore(simpleExploreForm)(message)
     }
-
-
 
 
     <div id="content">
       <div class="container">
         <div class="row">
-          @content
           @sidebar
+          @content
         </div>
       </div>
     </div>
-
-
-
-
 
 
     <!-- begin:footer -->
@@ -191,6 +183,7 @@
     <script src="@routes.Assets.versioned("orange/js/script.js")"></script>
 
 
+    @js
 
 
   </body>

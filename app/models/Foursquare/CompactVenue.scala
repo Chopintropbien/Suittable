@@ -6,7 +6,7 @@ import play.api.libs.functional.syntax._
 
 case class CompactVenue(id: String,
                         name: String,
-                        contact: Contact,
+                        contact: Option[Contact],
                         location: Location,
                         categories: Seq[Category],
                         verified: Boolean,
@@ -20,7 +20,7 @@ object CompactVenue{
   implicit val reads: Reads[CompactVenue] = (
       (JsPath \ "id").read[String] and
       (JsPath \ "name").read[String] and
-      (JsPath \ "contact").read[Contact] and
+      (JsPath \ "contact").readNullable[Contact] and
       (JsPath \ "location").read[Location] and
       (JsPath \ "categories").read[Seq[Category]] and
       (JsPath \ "verified").read[Boolean] and
@@ -33,7 +33,7 @@ object CompactVenue{
   implicit val writes: Writes[CompactVenue] = (
     (JsPath \ "id").write[String] and
       (JsPath \ "name").write[String] and
-      (JsPath \ "contact").write[Contact] and
+      (JsPath \ "contact").writeNullable[Contact] and
       (JsPath \ "location").write[Location] and
       (JsPath \ "categories").write[Seq[Category]] and
       (JsPath \ "verified").write[Boolean] and

@@ -5,7 +5,7 @@ import java.util.Calendar
 import javax.inject.Inject
 import java.net.URLEncoder
 
-import models.SimpleSearch._
+import models.SimpleExplore._
 import play.api.libs.json.Json
 import play.api.libs.oauth.{RequestToken, ConsumerKey}
 import play.api.libs.ws.{WSResponse, WSClient}
@@ -27,37 +27,67 @@ class Foursquare @Inject() (ws: WSClient) extends Controller{
   private val clientID = "LMKLGZJFEJLA4Q1N45KFTAWWCIYHCLYCGYJC5XRSCGOLVGOK"
   private val clientSecret = "J21P11PTLSF2ZFUKY050C54NRGBT3XEI20IL1RETP0VH3NVO"
 
-  private val authUrlAttribute = "client_id=" + URLEncoder.encode(clientID, "UTF-8") +
-    "&client_secret=" + URLEncoder.encode(clientSecret, "UTF-8")+
-    "&v=" + new SimpleDateFormat("yyyyMMdd").format(Calendar.getInstance.getTime)
-
   private val hostUrl = "https://api.foursquare.com/"
+  private val authUrlAttribute =
+    "?client_id=" + URLEncoder.encode(clientID, "UTF-8") +
+    "&client_secret=" + URLEncoder.encode(clientSecret, "UTF-8")+
+    "&v=" + new SimpleDateFormat("yyyyMMdd").format(Calendar.getInstance.getTime) +
+    "&m=foursquare"
+  private def url(path: String) = hostUrl + path + authUrlAttribute
 
-  private val accessTokenUrl = "https://foursquare.com/oauth2/access_token"
-  private val authorizeUrl = "https://foursquare.com/oauth2/authorize"
-  private val searchUrl = hostUrl + "v2/venues/search?" + authUrlAttribute
-
-  private val categoriesUrl = hostUrl + "v2/venues/categories?" + authUrlAttribute
+  private val exploreUrl = url("v2/venues/explore")
+  private val categoriesUrl = url("v2/venues/categories")
+  private def photoVenueUrl(venueId: String) = url("v2/venues/"+ venueId +"/photos")
 
 
-  // categoriesId : ,Id1,id2
-  def search(near: String, query: String, categoriesId: String = "") = {
-    val url = searchUrl + "&near=" + URLEncoder.encode(near, "UTF-8") +
+  private val DEFAULT_RADIUS = 2000
+  private val DEFAULT_LIMIT = 20
+
+
+  def getResponseUrl(url: String): Future[WSResponse] = ws.url(url).get // TODO: error
+
+  // categoriesId : Id1,id2
+  def explore(near: String, query: String, radius: Int, categoriesId: String = "") = {
+    val url = exploreUrl + "&near=" + URLEncoder.encode(near, "UTF-8") +
       "&query=" + URLEncoder.encode(query, "UTF-8") +
-      "&categoryId=4d4b7105d754a06374d81259" + categoriesId
-    ws.url(url).get // TODO: error
+      "&radius=" + radius +
+      "&categoryId=52e81612bcbc57f1066b79eb" + categoriesId +
+      "&limit=" + DEFAULT_LIMIT
+    getResponseUrl(url)
   }
 
-  def simpleSearch = Action { implicit request =>
-    simpleSearchForm.bindFromRequest.fold(
-      errorForm => Ok("d"),
-      simpleSearchData => {
-        val r = Await.result(search(simpleSearchData.near, simpleSearchData.query), 10000 millisecond)
-        (r.json \ "response" \ "venues").asOpt[Seq[CompactVenue]] match {
+  def miniaturePhotoUrl(venueId: String): String = {
+    val url = photoVenueUrl(venueId) + "&limit=1"
+    val r = Await.result(getResponseUrl(url), 10000 milliseconds)
+
+    (r.json \ "response" \ "photos" \ "items")(0).asOpt[Photo] match {
+      case None => "" // TODO: Mettre une photo en cas de non photo
+      case Some(photo) => photo.medium
+    }
+  }
+
+
+  def simpleExplore = Action { implicit request =>
+    simpleExploreForm.bindFromRequest.fold(
+      errorForm => Ok("d"), // TODO
+      simpleExploreData => {
+        val r = Await.result(explore(simpleExploreData.near, simpleExploreData.query, DEFAULT_RADIUS), 10000 millisecond)
+//        Ok(Json.prettyPrint(r.json))
+        (r.json \ "response").asOpt[ResponseExplore] match {
           case None => Ok("Bib problem") // TODO
-          case Some(venues) => {
-//            Ok(Json.prettyPrint(r.json))
-            Ok(views.html.search.search(venues, foodCategories))
+          case Some(responseExplore) => {
+            /* filter the venues to be sure they have all the information needed for the display:
+                - lat and lng exist
+             */
+            val filteredVenue: Seq[(CompactVenue, String)] =
+              responseExplore.groups.flatMap{ g =>
+                g.items.collect {
+                  case i if (i.venue.location.lat.isDefined && i.venue.location.lng.isDefined) => {
+                    (i.venue, miniaturePhotoUrl(i.venue.id))
+                  }
+                }
+              }
+            Ok(views.html.explore.explore(filteredVenue, responseExplore.geocode, foodCategories))
           }
         }
       }
@@ -100,10 +130,11 @@ class Foursquare @Inject() (ws: WSClient) extends Controller{
 
 
 
+
   def test = Action{
 
     // TODO: Pas plua protege ????
-    def url = searchUrl + "&ll=40.7,-74"
+    def url = exploreUrl + "&ll=40.7,-74"
 
     val r1: Future[WSResponse] = ws.url(url).get
     val r = Await.result(r1, 10000000 millisecond)
