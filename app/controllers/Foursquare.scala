@@ -44,7 +44,7 @@ class Foursquare @Inject() (ws: WSClient) extends Controller{
   private val DEFAULT_LIMIT = 20
 
 
-  def getResponseUrl(url: String): Future[WSResponse] = ws.url(url).get // TODO: error
+  def getResponseUrl(url: String): Future[WSResponse] = ws.url(url).get // TODO: error quand il n'y a pas de connection internet
 
   // categoriesId : Id1,id2
   def explore(near: String, query: String, radius: Int, categoriesId: String = "") = {
@@ -56,13 +56,13 @@ class Foursquare @Inject() (ws: WSClient) extends Controller{
     getResponseUrl(url)
   }
 
-  def miniaturePhotoUrl(venueId: String): String = {
+  def miniaturePhotoUrl(venueId: String): Photo = {
     val url = photoVenueUrl(venueId) + "&limit=1"
     val r = Await.result(getResponseUrl(url), 10000 milliseconds)
 
     (r.json \ "response" \ "photos" \ "items")(0).asOpt[Photo] match {
-      case None => "" // TODO: Mettre une photo en cas de non photo
-      case Some(photo) => photo.medium
+      case None => Photo("", 0, "", "", "") // TODO: Mettre une photo en cas de non photo
+      case Some(photo) => photo
     }
   }
 
@@ -74,12 +74,12 @@ class Foursquare @Inject() (ws: WSClient) extends Controller{
         val r = Await.result(explore(simpleExploreData.near, simpleExploreData.query, DEFAULT_RADIUS), 10000 millisecond)
 //        Ok(Json.prettyPrint(r.json))
         (r.json \ "response").asOpt[ResponseExplore] match {
-          case None => Ok("Bib problem") // TODO
+          case None => Ok("Bib problem") // TODO: Si le serveur Foursquare a des probleme
           case Some(responseExplore) => {
             /* filter the venues to be sure they have all the information needed for the display:
                 - lat and lng exist
              */
-            val filteredVenue: Seq[(CompactVenue, String)] =
+            val filteredVenue: Seq[(CompactVenue, Photo)] =
               responseExplore.groups.flatMap{ g =>
                 g.items.collect {
                   case i if (i.venue.location.lat.isDefined && i.venue.location.lng.isDefined) => {

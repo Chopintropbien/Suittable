@@ -1,36 +1,102 @@
 @import models.Foursquare.CompactVenue
+@import models.Foursquare.Photo
 
-@(venue: CompactVenue, miniaturePhotoUrl: String)
+@(venue: CompactVenue, miniaturePhoto: Photo)
+
+<!--<div class="post-container">-->
+    <!--<div class="post-img" style="background: url(img/img12.jpg);"><h3>For Rent</h3></div>-->
+    <!--<div class="post-content">-->
+        <!--<div class="post-meta">-->
+            <!--<span><i class="fa fa-home"></i> 7,000 m<sup>2</sup> / </span>-->
+            <!--<span><i class="fa fa-hdd-o"></i> 3 Bed / </span>-->
+            <!--<span><i class="fa fa-male"></i> 2 Bath / </span>-->
+            <!--<span><i class="fa fa-building-o"></i> 2 Floors / </span>-->
+            <!--<span><i class="fa fa-car"></i> 2 Garages / </span>-->
+        <!--</div>-->
+        <!--<div class="heading-title">-->
+            <!--<h2><a href="#">Residential - <span>$300,000</span>/year</a></h2>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->
 
 
 <div class="property-container">
-    <div class="property-image">
-        <img src="@miniaturePhotoUrl" alt="mikha real estate theme">
-        <div class="property-price">
-            <h4></h4>
-            <span>$800,000</span>
-        </div>
-        <div class="property-status">
-            <span>For Rent</span>
-        </div>
-    </div>
-    <div class="property-features">
-        <span><i class="fa fa-home"></i> 5,000 m<sup>2</sup></span>
-        <span><i class="fa fa-hdd-o"></i> 2 Bed</span>
-        <span><i class="fa fa-male"></i> 2 Bath</span>
-    </div>
-    <div class="property-content">
-        <h3>
-            <a href="#">@venue.name</a>
-            <small>
-                @venue.location.formatAddress
-            </small>
+    <div class="property-content-list">
+        <div class="property-image-list">
+            <!--<div class="property-price">-->
+                <!--<h4>Villa</h4>-->
+                <!--<span>$30,000<small>/month</small></span>-->
+            <!--</div>-->
+            <div class="property-features">
+                <span><i class="fa fa-home"></i></span>
+                <span><i class="fa fa-home"></i></span>
+                <span><i class="fa fa-home"></i></span>
+                <span><i class="fa fa-home"></i></span>
+            </div>
+            <img src="@miniaturePhoto.medium" alt="arillo real estate theme">
 
-            @if(venue.contact.isDefined && venue.contact.get.formattedPhone.isDefined){
-                <small> @venue.contact.get.formattedPhone.get </small>
-            }
-        </h3>
+        </div>
+        <div class="property-text">
+            <h3>
+                <a href="#">@venue.name</a>
+                <div class="row">
+                    <div class="col-xs-1">
+                        @if(venue.rating.isDefined){
+                            @venue.rating.get
+                        }else{
+                            "no"
+                        }
+                    </div>
+                    <div class="col-xs-11">
+                        <div class="">
+                            <small>@venue.location.formatAddress</small>
+                        </div>
+                        <div class="">
+                            @if(venue.price.isDefined){
+                                @venue.price.get.tier
+                            }
+                        </div>
+                    </div>
+                </div>
+
+            </h3>
+
+            <p></p>
+        </div>
     </div>
 </div>
+
+@*
+<!--<div class="property-container">-->
+    <!--<div class="property-image">-->
+        <!--<img src="@miniaturePhotoUrl" alt="mikha real estate theme">-->
+        <!--<div class="property-price">-->
+            <!--<h4></h4>-->
+            <!--<span>$800,000</span>-->
+        <!--</div>-->
+        <!--<div class="property-status">-->
+            <!--<span>For Rent</span>-->
+        <!--</div>-->
+    <!--</div>-->
+    <!--<div class="property-features">-->
+        <!--<span><i class="fa fa-home"></i> 5,000 m<sup>2</sup></span>-->
+        <!--<span><i class="fa fa-hdd-o"></i> 2 Bed</span>-->
+        <!--<span><i class="fa fa-male"></i> 2 Bath</span>-->
+    <!--</div>-->
+    <!--<div class="property-content">-->
+        <!--<h3>-->
+            <!--<a href="#">@venue.name</a>-->
+            <!--<small>-->
+                <!--@venue.location.formatAddress-->
+            <!--</small>-->
+
+            <!--@if(venue.contact.isDefined && venue.contact.get.formattedPhone.isDefined){-->
+                <!--<small> @venue.contact.get.formattedPhone.get </small>-->
+            <!--}-->
+        <!--</h3>-->
+    <!--</div>-->
+<!--</div>-->
+
+*@
 
 
