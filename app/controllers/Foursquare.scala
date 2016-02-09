@@ -124,7 +124,6 @@ class Foursquare @Inject() (ws: WSClient) extends Controller{
         Ok(Json.prettyPrint(Json.toJson(categories)))
       }
     }
-
   }
 
 

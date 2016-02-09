@@ -12,22 +12,41 @@
             <div class="quick-search">
                 <div class="row">
 
-                    @helper.form(action = routes.Foursquare.simpleExplore, args= 'role -> "form"){
+                    @helper.form(action = routes.Foursquare.simpleExplore, args= 'role -> "form", 'id -> "formSearch"){
                         <div class="col-md-5 col-sm-6 col-xs-12">
-                            <div class="form-group">
+                            <div>
                                 <label for="query">Find : </label>
                                 @helper.inputText(simpleExploreForm("query"),
                                     args = 'class -> "form-control",
-                                    'placeholder -> "Pizza, Sushi, french food...")
+                                    'id -> "queryInput",
+                                    'placeholder -> "Pizza, Sushi, french food...",
+                                    'autocomplete -> "off")
                             </div>
+                            <div class="autocomplete">
+                                <ul id="queryAutocomplete" style="display: none;">
+                                    <li>j</li>
+                                    <li>jfnejnfesssssssj</li>
+                                    <li>jfnejnfej</li>
+                                </ul>
+                            </div>
+
                         </div>
 
                         <div class="col-md-5 col-sm-6 col-xs-12">
-                            <div class="form-group">
+                            <div>
                                 <label for="near">Near : </label>
                                 @helper.inputText(simpleExploreForm("near"),
                                 args = 'class -> "form-control",
-                                'placeholder -> "City, address, zip, ...")
+                                'id -> "nearInput",
+                                'placeholder -> "City, address, zip, ...",
+                                'autocomplete -> "off")
+                            </div>
+                            <div class="autocomplete">
+                                <ul id="nearAutocomplete" style="display: none;">
+                                    <li>jfnejnfej</li>
+                                    <li>jfnejnfej</li>
+                                    <li>jfnejnfej</li>
+                                </ul>
                             </div>
                         </div>
 
