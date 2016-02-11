@@ -38,16 +38,30 @@ class Foursquare @Inject() (ws: WSClient) extends Controller{
   private val exploreUrl = url("v2/venues/explore")
   private val categoriesUrl = url("v2/venues/categories")
   private def photoVenueUrl(venueId: String) = url("v2/venues/"+ venueId +"/photos")
+  private val suggestcompletionUrl = url("v2/venues/suggestcompletion")
 
 
   private val DEFAULT_RADIUS = 2000
   private val DEFAULT_LIMIT = 20
 
 
+  /**
+   * Get the expected response off the url
+   * @param url the url we want to connect
+   * @return Get the expected response off the url
+   */
   def getResponseUrl(url: String): Future[WSResponse] = ws.url(url).get // TODO: error quand il n'y a pas de connection internet
 
-  // categoriesId : Id1,id2
-  def explore(near: String, query: String, radius: Int, categoriesId: String = "") = {
+  /**
+   * Get the response for a foursquare explore
+   * @param near A string naming a place in the world.
+   * @param query A term to be searched against a venue's tips, category, etc.
+   * @param radius Radius to search within, in meters. If radius is not specified,
+   *               a suggested radius will be used based on the density of venues in the area.
+   * @param categoriesId
+   * @return
+   */
+  def explore(near: String, query: String, radius: Int, categoriesId: String = ""): Future[WSResponse] = {
     val url = exploreUrl + "&near=" + URLEncoder.encode(near, "UTF-8") +
       "&query=" + URLEncoder.encode(query, "UTF-8") +
       "&radius=" + radius +
@@ -56,6 +70,11 @@ class Foursquare @Inject() (ws: WSClient) extends Controller{
     getResponseUrl(url)
   }
 
+  /**
+   * Search the main photo to represent a venue.
+   * @param venueId The foursquare Id of the venue
+   * @return The main photo of this venue, if it does not exist, then the default one for a venue
+   */
   def miniaturePhotoUrl(venueId: String): Photo = {
     val url = photoVenueUrl(venueId) + "&limit=1"
     val r = Await.result(getResponseUrl(url), 10000 milliseconds)
@@ -67,6 +86,7 @@ class Foursquare @Inject() (ws: WSClient) extends Controller{
   }
 
 
+
   def simpleExplore = Action { implicit request =>
     simpleExploreForm.bindFromRequest.fold(
       errorForm => Ok("d"), // TODO
@@ -74,7 +94,7 @@ class Foursquare @Inject() (ws: WSClient) extends Controller{
         val r = Await.result(explore(simpleExploreData.near, simpleExploreData.query, DEFAULT_RADIUS), 10000 millisecond)
 //        Ok(Json.prettyPrint(r.json))
         (r.json \ "response").asOpt[ResponseExplore] match {
-          case None => Ok("Bib problem") // TODO: Si le serveur Foursquare a des probleme
+          case None => Ok("Bib problem") // TODO: Si le serveur Foursquare a des probleme ou si il arrive pas a trouver la reponse
           case Some(responseExplore) => {
             /* filter the venues to be sure they have all the information needed for the display:
                 - lat and lng exist
@@ -95,8 +115,8 @@ class Foursquare @Inject() (ws: WSClient) extends Controller{
   }
 
   /**
-   *
-   * @return All the food Categories
+   * Put all the existing food foursquare categories in one Seq
+   * @return All the food foursquare Categories
    */
   def foodCategories: Seq[Category] = {
     val c = Await.result(ws.url(categoriesUrl).get, 100000 milliseconds)
@@ -111,6 +131,45 @@ class Foursquare @Inject() (ws: WSClient) extends Controller{
       }
     }
   }
+
+
+  /**
+   * Provide suggestion of possible venues the user want when he enter the letter contained in the query
+   * This is of the autocompletion
+   * @param near where the user is located
+   * @param query the letter the user enter for a search
+   * @return  the response give by the foursquare server
+   */
+  def suggestion(near: String, query: String): Future[WSResponse] = {
+    val url = suggestcompletionUrl + "&near=" + URLEncoder.encode(near, "UTF-8") +
+                                     "&query=" + URLEncoder.encode(query, "UTF-8")
+    getResponseUrl(url)
+  }
+
+  def autoCompletion(near: String, query: String) = Action{ implicit request =>
+    val r = Await.result(suggestion(near, query), 1000000 millisecond)
+    (r.json \ "response" \ "minivenues").asOpt[Seq[SuggestedVenue]] match {
+      case None => Ok("Probleme!!!") // TODO: ben faire le plus chiant... les erreurs +
+      case Some(venues) => Ok(Json.prettyPrint(Json.toJson(venues.take(10))))
+    }
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
   def displayCategories = Action{ implicit request =>
     val c = Await.result(ws.url(categoriesUrl).get, 100000 milliseconds) // TODO: error
