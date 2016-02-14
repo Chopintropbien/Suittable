@@ -43,6 +43,7 @@ class Foursquare @Inject() (ws: WSClient) extends Controller{
 
   private val DEFAULT_RADIUS = 2000
   private val DEFAULT_LIMIT = 20
+  private val DEFAULT_LIMIT_SUGGEST_COMPLETION = 10
 
 
   /**
@@ -65,7 +66,7 @@ class Foursquare @Inject() (ws: WSClient) extends Controller{
     val url = exploreUrl + "&near=" + URLEncoder.encode(near, "UTF-8") +
       "&query=" + URLEncoder.encode(query, "UTF-8") +
       "&radius=" + radius +
-      "&categoryId=52e81612bcbc57f1066b79eb" + categoriesId +
+      "&categoryId=" + categoriesId + //52e81612bcbc57f1066b79eb
       "&limit=" + DEFAULT_LIMIT
     getResponseUrl(url)
   }
@@ -89,7 +90,7 @@ class Foursquare @Inject() (ws: WSClient) extends Controller{
 
   def simpleExplore = Action { implicit request =>
     simpleExploreForm.bindFromRequest.fold(
-      errorForm => Ok("d"), // TODO
+      errorForm => Ok("pas bon remplissage du form"), // TODO
       simpleExploreData => {
         val r = Await.result(explore(simpleExploreData.near, simpleExploreData.query, DEFAULT_RADIUS), 10000 millisecond)
 //        Ok(Json.prettyPrint(r.json))
@@ -142,7 +143,8 @@ class Foursquare @Inject() (ws: WSClient) extends Controller{
    */
   def suggestion(near: String, query: String): Future[WSResponse] = {
     val url = suggestcompletionUrl + "&near=" + URLEncoder.encode(near, "UTF-8") +
-                                     "&query=" + URLEncoder.encode(query, "UTF-8")
+                                     "&query=" + URLEncoder.encode(query, "UTF-8") +
+                                     "&limit=" + DEFAULT_LIMIT_SUGGEST_COMPLETION
     getResponseUrl(url)
   }
 
@@ -150,7 +152,7 @@ class Foursquare @Inject() (ws: WSClient) extends Controller{
     val r = Await.result(suggestion(near, query), 1000000 millisecond)
     (r.json \ "response" \ "minivenues").asOpt[Seq[SuggestedVenue]] match {
       case None => Ok("Probleme!!!") // TODO: ben faire le plus chiant... les erreurs +
-      case Some(venues) => Ok(Json.prettyPrint(Json.toJson(venues.take(10))))
+      case Some(venues) => Ok(Json.prettyPrint(Json.toJson(venues)))
     }
   }
 
