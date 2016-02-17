@@ -14,6 +14,10 @@
 @restaurants = {
   <div class="container-realestate">
 
+    <canvas id="mon_canvas" width="200" height="200">
+      Message pour les navigateurs ne supportant pas encore canvas.
+    </canvas>
+
     @for(i <- 0 until compactVenues.length){
     @if(i == 0 || i ==3 || i == 9){
     <div class="row">
@@ -184,6 +188,10 @@
 }
 
 @js = {
+
+<script src="@routes.Assets.versioned("javascripts/animationHappyness.js")"></script>
+
+
 <!--Set google map-->
 <script src="@routes.Assets.versioned("javascripts/map/addMarker.js")"></script>
 <script>
